@@ -1,0 +1,130 @@
+#!groovy
+pipeline{
+ agent any
+ 
+  tools {
+    npm 'npm'
+  }
+//   environment{
+//     sonar_token=credentials("")
+//     dojo_sonar_url= 'URL'
+//   }
+
+
+stages{
+        //stage('Code Clone from GIT'){
+          //  steps{
+            //    withCredentials()
+            //}
+        //}
+
+        stage('Compile and Clean'){
+            steps{
+                script{
+                       try{
+                            bat "npm run clean"
+                       }
+                       catch(all){
+                            echo "Compile and clean stage Failed"
+                       }
+                }
+            }
+        }
+
+        stage('Test'){
+                    steps{
+                        script{
+                               try{
+                                    bat 'npm test'
+                               }
+                               catch(all){
+                                    echo "Test stage Failed"
+                               }
+                        }
+                    }
+                }
+
+        stage('Build'){
+                    steps{
+                        script{
+                               try{
+                                    bat 'npm build'
+                               }
+                               catch(all){
+                                    echo "Build stage Failed. War file not created"
+                               }
+                        }
+                    }
+                }
+        stage('Verify'){
+            steps{
+                script{
+                       try{
+                            bat "npm verify"
+                       }
+                       catch(all){
+                            echo "Verify stage Failed"
+                       }
+                }
+            }
+        }
+
+        stage('Install'){
+            steps{
+                script{
+                       try{
+                            bat "npm install"
+                       }
+                       catch(all){
+                            echo "Install stage Failed"
+                       }
+                }
+            }
+        }
+
+
+        stage('SonarQube Report'){
+            steps{
+                withSonarQubeEnv(installationName: 'SonarQube'){
+                    sh './mvnw clean sonar:sonar'
+                }
+            }
+//             post{
+//                 always{
+//                     junit allowEmptyResults: true,testResults: '**/test-results/*.xml'
+//                 }
+//                 failure{
+//                     echo "Pipeline Failed"
+//                 }
+//             }
+        }
+
+//        stage('Code Coverage Report'){
+
+        //}
+
+//         stage('Build Docker'){
+//               bat "docker build -f dockerfile -t insappv1 . "
+//         }
+
+//         stage('Deployment on Kubernetes'){
+// 
+//         }
+
+
+  }
+//   catch(all) {
+//          currentBuild.result = 'FAILURE'
+//          //post {
+//            //  always {
+//              //        emailext body: 'A Test EMail', recipientProviders: [[$class: 'DevelopersRecipientProvider'], [$class: 'RequesterRecipientProvider']], subject: 'Test'
+//             // }
+//         // }
+//   }
+
+  //finally {
+    //     step $class: 'JUnitResultArchiver', testResults: '**/TEST-*.xml'
+  //}
+
+}
+
