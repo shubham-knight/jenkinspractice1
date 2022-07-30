@@ -3,7 +3,7 @@ pipeline{
  agent any
  
   tools {
-    npm 'npm'
+    nodejs "node"
   }
 //   environment{
 //     sonar_token=credentials("")
@@ -86,7 +86,7 @@ stages{
         stage('SonarQube Report'){
             steps{
                 withSonarQubeEnv(installationName: 'SonarQube'){
-                    sh './mvnw clean sonar:sonar'
+                    bat './mvnw clean sonar:sonar'
                 }
             }
 //             post{
