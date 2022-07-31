@@ -103,13 +103,32 @@ stages{
 
         //}
 
-//         stage('Build Docker'){
-//               bat "docker build -f dockerfile -t insappv1 . "
-//         }
+        stage('Build Docker'){
+            steps{
+                script{
+                     myapp="docker build -f dockerfile -t prodDevMicroService . "
+                }
+            }
+        }
 
-//         stage('Deployment on Kubernetes'){
-// 
-//         }
+        stage('Push Docker image'){
+            steps{
+                script {
+                    docker.withRegistry('https://registry.hub.docker.com', 'dockerhub') {
+                           myapp.push("latest")
+                           myapp.push("${env.BUILD_ID}")
+                       }
+                }
+            }
+        }
+
+        stage('Deployment on Kubernetes'){
+            steps{
+                scripts{
+                    kubernetesDeploy(configs: "", kubeconfigId: "mykubeConfig")
+                }
+            }
+        }
 
 
   }

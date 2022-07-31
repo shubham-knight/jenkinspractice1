@@ -1,2 +1,0 @@
-//STEP2
-export const CREATE_POLICY = "CREATE_POLICY";
